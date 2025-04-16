@@ -9,7 +9,11 @@
 </head>
 <body>
     <div class="container">
-        <aside class="sidebar">
+        <button class="menu-toggle" id="mobile-menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <h1>COMMUNITY<br>EMERGENCY HUB</h1>
             </div>
@@ -105,5 +109,16 @@
             </div>
         </main>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const sidebar = document.getElementById('sidebar');
+            
+            mobileMenu.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+        });
+    </script>
 </body>
 </html>
