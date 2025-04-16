@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map - Community Emergency Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        /* Modern dropdown styles */
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .map-dropdown-btn {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-align: left;
+        }
+        
+        .map-dropdown-btn:hover {
+            background-color: #34495e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        }
+        
+        .map-dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 55px;
+            background-color: white;
+            min-width: 250px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 1001;
+            border-radius: 10px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .map-dropdown-content.show {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .map-btn {
+            display: flex;
+            width: 100%;
+            text-align: left;
+            padding: 14px 18px;
+            background-color: white;
+            color: #333;
+            border: none;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            align-items: center;
+        }
+        
+        .map-btn:first-child {
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .map-btn:last-child {
+            border-bottom: none;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .map-btn:hover {
+            background-color: #f8f9fa;
+            padding-left: 22px;
+        }
+        
+        .map-btn i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #FF4444;
+        }
+        
+        .map-btn.active {
+            background-color: #FF4444;
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .map-btn.active i {
+            color: white;
+        }
+        
+        .map-btn.active:hover {
+            background-color: #FF4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>COMMUNITY<br>EMERGENCY HUB</h1>
+            </div>
+            
+            <div class="tools">
+                <h2>TOOLS</h2>
+                <ul>
+                    <li><a href="#" class="active"><i class="fas fa-map-marker-alt"></i> Interactive Map</a></li>
+                    <li><a href="../first-aid/firstaid.html"><i class="fas fa-kit-medical"></i> First Aid Application</a></li>
+                    <li><a href="../hotline/hotline.html"><i class="fas fa-phone"></i> Who to Call</a></li>
+                    <li><a href="../"><i class="fas fa-home"></i> Homepage</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="map-container">
+                <div id="map"></div>
+                <div class="info-panel" id="info-panel">
+                    <button id="close-info" class="close-btn" onclick="closeInfoPanel()"><i class="fas fa-times"></i></button>
+                    <h2>Location Information</h2>
+                    <div id="info-content"></div>
+                </div>
+                <div class="map-controls">
+                    <button class="map-dropdown-btn"><i class="fas fa-tools"></i> Tools <i class="fas fa-caret-down"></i></button>
+                    <div class="map-dropdown-content">
+                        <button class="map-btn" onclick="toggleEvacuationCenters()"><i class="fas fa-building"></i> Evacuation Centers</button>
+                        <button class="map-btn" onclick="toggleFloodProne()"><i class="fas fa-water"></i> Flood-Prone Areas</button>
+                        <button class="map-btn" onclick="toggleEmergencyFacilities()"><i class="fas fa-hospital"></i> Emergency Facilities</button>
+                        <button class="map-btn" onclick="toggleMedicalFacilities()"><i class="fas fa-clinic-medical"></i> Medical Facilities</button>
+                        <button class="map-btn" onclick="toggleSchools()"><i class="fas fa-school"></i> Schools</button>
+                        <button class="map-btn" onclick="toggleSportsVenues()"><i class="fas fa-basketball-ball"></i> Sports Venues</button>
+                        <button class="map-btn" onclick="toggleCommunityCenters()"><i class="fas fa-users"></i> Community Centers</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize the map centered on Valenzuela City with a wider view
+        const map = L.map('map').setView([14.6950, 120.9850], 13);
+        
+        // Variable to track if info panel is open
+        let isInfoPanelOpen = false;
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Map control functions
+        let evacuationMarkers = [];
+        let floodOverlay = null;
+        let facilityMarkers = [];
+        let floodLabel = null;
+        let isEvacuationVisible = false;
+        let isFloodVisible = false;
+        let isFacilitiesVisible = false;
+        let medicalMarkers = [];
+        let schoolMarkers = [];
+        let sportsMarkers = [];
+        let communityMarkers = [];
+        let isMedicalVisible = false;
+        let isSchoolsVisible = false;
+        let isSportsVisible = false;
+        let isCommunityVisible = false;
+
+        function toggleEvacuationCenters() {
+            if (isEvacuationVisible) {
+                // Remove existing markers
+                evacuationMarkers.forEach(marker => {
+                    marker.marker.remove();
+                    marker.label.remove();
+                });
+                evacuationMarkers = [];
+                isEvacuationVisible = false;
+            } else {
+                // Evacuation center locations
+                const centers = [
+                    { name: 'Marulas Central School', coords: [14.6778, 120.9735] },
+                    { name: 'Marulas Elementary School', coords: [14.6762, 120.9751] },
+                    { name: 'Marulas Covered Court', coords: [14.6755, 120.9728] }
+                ];
+
+                // Add markers
+                centers.forEach(center => {
+                    const marker = L.marker(center.coords)
+                        .on('click', () => {
+                            const infoPanel = document.getElementById('info-panel');
+                            const isCurrentlyOpen = infoPanel.style.right === '0px';
+                            
+                            // Update content
+                            document.getElementById('info-content').innerHTML = `
+                                <h3>${center.name}</h3>
+                                <p><strong>Type:</strong> Evacuation Center</p>
+                                <p><strong>Location:</strong> ${center.coords[0].toFixed(4)}, ${center.coords[1].toFixed(4)}</p>
+                                <p><strong>Capacity:</strong> 500 people</p>
+                                <p><strong>Facilities:</strong></p>
+                                <ul>
+                                    <li>Emergency Power Supply</li>
+                                    <li>Clean Water Access</li>
+                                    <li>First Aid Station</li>
+                                    <li>Sanitation Facilities</li>
+                                </ul>
+                            `;
+                            
+                            // Toggle panel visibility
+                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            isInfoPanelOpen = !isCurrentlyOpen;
+                        })
+                        .addTo(map);
+                    
+                    const label = L.marker(center.coords, {
+                        icon: L.divIcon({
+                            className: 'map-label',
+                            html: `<div>${center.name}</div>`,
+                            iconSize: [100, 20],
+                            iconAnchor: [50, 0]
+                        })
+                    }).addTo(map);
+                    
+                    evacuationMarkers.push({ marker, label });
+                });
+                isEvacuationVisible = true;
+            }
+        }
+
+        function toggleFloodProne() {
+            if (isFloodVisible) {
+                // Remove existing overlay and label
+                if (floodOverlay) {
+                    floodOverlay.remove();
+                    floodOverlay = null;
+                }
+                if (floodLabel) {
+                    floodLabel.remove();
+                    floodLabel = null;
+                }
+                isFloodVisible = false;
+            } else {
+                // Define flood-prone area polygon
+                const floodArea = [
+                    [14.6780, 120.9720],
+                    [14.6775, 120.9740],
+                    [14.6760, 120.9745],
+                    [14.6755, 120.9725],
+                    [14.6780, 120.9720]
+                ];
+
+                // Add polygon overlay
+                floodOverlay = L.polygon(floodArea, {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.3
+                }).bindPopup('High-risk flood area').addTo(map);
+
+                // Add label for flood area
+                const floodCenter = [
+                    (floodArea[0][0] + floodArea[2][0]) / 2,
+                    (floodArea[0][1] + floodArea[2][1]) / 2
+                ];
+                floodLabel = L.marker(floodCenter, {
+                    icon: L.divIcon({
+                        className: 'map-label flood-label',
+                        html: '<div>Flood-Prone Area</div>',
+                        iconSize: [100, 20],
+                        iconAnchor: [50, 0]
+                    })
+                }).addTo(map);
+                isFloodVisible = true;
+            }
+        }
+
+        function toggleEmergencyFacilities() {
+            if (isFacilitiesVisible) {
+                // Remove existing markers
+                facilityMarkers.forEach(marker => {
+                    marker.marker.remove();
+                    marker.label.remove();
+                });
+                facilityMarkers = [];
+                isFacilitiesVisible = false;
+            } else {
+                // Emergency facility locations
+                const facilities = [
+                    { name: 'Valenzuela City Emergency Hospital', coords: [14.6770, 120.9745] },
+                    { name: 'Marulas Fire Station', coords: [14.6758, 120.9738] },
+                    { name: 'Marulas Police Station', coords: [14.6765, 120.9732] }
+                ];
+
+                // Add markers
+                facilities.forEach(facility => {
+                    const marker = L.marker(facility.coords)
+                        .on('click', () => {
+                            const infoPanel = document.getElementById('info-panel');
+                            const isCurrentlyOpen = infoPanel.style.right === '0px';
+                            
+                            document.getElementById('info-content').innerHTML = `
+                                <h3>${facility.name}</h3>
+                                <p><strong>Type:</strong> Emergency Facility</p>
+                                <p><strong>Location:</strong> ${facility.coords[0].toFixed(4)}, ${facility.coords[1].toFixed(4)}</p>
+                                <p><strong>Operating Hours:</strong> 24/7</p>
+                                <p><strong>Emergency Services:</strong></p>
+                                <ul>
+                                    <li>24/7 Emergency Response</li>
+                                    <li>Ambulance Service</li>
+                                    <li>Medical Treatment</li>
+                                    <li>Emergency Equipment</li>
+                                </ul>
+                            `;
+                            
+                            // Toggle panel visibility
+                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            isInfoPanelOpen = !isCurrentlyOpen;
+                        })
+                        .addTo(map);
+                    
+                    const label = L.marker(facility.coords, {
+                        icon: L.divIcon({
+                            className: 'map-label facility-label',
+                            html: `<div>${facility.name}</div>`,
+                            iconSize: [200, 20],
+                            iconAnchor: [100, 0]
+                        })
+                    }).addTo(map);
+                    
+                    facilityMarkers.push({ marker, label });
+                });
+                isFacilitiesVisible = true;
+            }
+        }
+    
+        function toggleMedicalFacilities() {
+            if (isMedicalVisible) {
+                medicalMarkers.forEach(marker => {
+                    marker.marker.remove();
+                    marker.label.remove();
+                });
+                medicalMarkers = [];
+                isMedicalVisible = false;
+            } else {
+                const facilities = [
+                    { name: 'Valenzuela Medical Center', coords: [14.68976, 120.97807] },
+                    { name: 'Northern Health Medical and Diagnostic Center', coords: [14.6780, 120.9755] },
+                    { name: 'Healthy Link Medical Clinic & Diagnostic Center', coords: [14.6790, 120.9765] },
+                    { name: 'Fatima University Medical Center', coords: [14.67797, 120.98095] },
+                    { name: 'E. Perlas Diagnostic and Polyclinic', coords: [14.6810, 120.9785] },
+                    { name: 'Calalang General Hospital', coords: [14.67269, 120.98253] }
+                ];
+
+                facilities.forEach(facility => {
+                    const marker = L.marker(facility.coords)
+                        .on('click', () => {
+                            const infoPanel = document.getElementById('info-panel');
+                            const isCurrentlyOpen = infoPanel.style.right === '0px';
+                            
+                            document.getElementById('info-content').innerHTML = `
+                                <h3>${facility.name}</h3>
+                                <p><strong>Type:</strong> Medical Facility</p>
+                                <p><strong>Location:</strong> ${facility.coords[0].toFixed(4)}, ${facility.coords[1].toFixed(4)}</p>
+                                <p><strong>Services:</strong></p>
+                                <ul>
+                                    <li>24/7 Emergency Care</li>
+                                    <li>Diagnostic Services</li>
+                                    <li>Medical Consultations</li>
+                                </ul>
+                            `;
+                            
+                            // Toggle panel visibility
+                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            isInfoPanelOpen = !isCurrentlyOpen;
+                        })
+                        .addTo(map);
+                    
+                    const label = L.marker(facility.coords, {
+                        icon: L.divIcon({
+                            className: 'map-label medical-label',
+                            html: `<div>${facility.name}</div>`,
+                            iconSize: [200, 20],
+                            iconAnchor: [100, 0]
+                        })
+                    }).addTo(map);
+                    
+                    medicalMarkers.push({ marker, label });
+                });
+                isMedicalVisible = true;
+            }
+        }
+
+        function toggleSchools() {
+            if (isSchoolsVisible) {
+                schoolMarkers.forEach(marker => {
+                    marker.marker.remove();
+                    marker.label.remove();
+                });
+                schoolMarkers = [];
+                isSchoolsVisible = false;
+            } else {
+                const schools = [
+                    { name: 'Valenzuela National High School', coords: [14.6830, 120.9805] },
+                    { name: 'Mapulang Lupa National High School', coords: [14.70172, 121.00936] },
+                    { name: 'Sto. Rosario Montessori School', coords: [14.6840, 120.9815] },
+                    { name: 'St. Peter Velle Technical Training Center', coords: [14.6850, 120.9825] },
+                    { name: 'SKM Christian Academy', coords: [14.6860, 120.9835] },
+                    { name: 'Serrano Elementary School', coords: [14.6870, 120.9845] },
+                    { name: 'San Miguel Heights Elementary School', coords: [14.6880, 120.9855] },
+                    { name: 'Our Lady of Fatima University', coords: [14.67797, 120.98095] },
+                    { name: 'Vicente P. Trinidad National High School', coords: [14.7053, 120.9542] },
+                    { name: 'St. Gregory College of Valenzuela', coords: [14.6900, 120.9875] },
+                    { name: 'Gen. T. de Leon National High School', coords: [14.6910, 120.9885] },
+                    { name: 'Parada National High School', coords: [14.6920, 120.9895] },
+                    { name: 'St. Louis College Valenzuela', coords: [14.6930, 120.9905] }
+                ];
+
+                schools.forEach(school => {
+                    const marker = L.marker(school.coords)
+                        .on('click', () => {
+                            const infoPanel = document.getElementById('info-panel');
+                            const isCurrentlyOpen = infoPanel.style.right === '0px';
+                            
+                            document.getElementById('info-content').innerHTML = `
+                                <h3>${school.name}</h3>
+                                <p><strong>Type:</strong> Educational Institution</p>
+                                <p><strong>Location:</strong> ${school.coords[0].toFixed(4)}, ${school.coords[1].toFixed(4)}</p>
+                                <p><strong>Facilities:</strong></p>
+                                <ul>
+                                    <li>Classrooms</li>
+                                    <li>Library</li>
+                                    <li>Computer Laboratory</li>
+                                </ul>
+                            `;
+                            
+                            // Toggle panel visibility
+                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            isInfoPanelOpen = !isCurrentlyOpen;
+                        })
+                        .addTo(map);
+                    
+                    const label = L.marker(school.coords, {
+                        icon: L.divIcon({
+                            className: 'map-label school-label',
+                            html: `<div>${school.name}</div>`,
+                            iconSize: [200, 20],
+                            iconAnchor: [100, 0]
+                        })
+                    }).addTo(map);
+                    
+                    schoolMarkers.push({ marker, label });
+                });
+                isSchoolsVisible = true;
+            }
+        }
+
+        function toggleSportsVenues() {
+            if (isSportsVisible) {
+                sportsMarkers.forEach(marker => {
+                    marker.marker.remove();
+                    marker.label.remove();
+                });
+                sportsMarkers = [];
+                isSportsVisible = false;
+            } else {
+                const venues = [
+                    { name: 'THOA Wild Center', coords: [14.7040, 121.0015] },
+                    { name: 'Potrero Covered Court', coords: [14.7050, 121.0025] },
+                    { name: 'Parish of the Holy Cross Basketball Court', coords: [14.7060, 121.0035] },
+                    { name: 'Manotoc Basketball Court', coords: [14.68306, 120.97972] },
+                    { name: 'Lena Subdivision Basketball Court', coords: [14.70916, 120.96404] },
+                    { name: 'D.E.V. Basketball Court', coords: [14.71319, 120.96444] },
+                    { name: 'Basketball Court at 33 Filomina', coords: [14.7090, 121.0065] },
+                    { name: 'Elysian Court', coords: [14.7100, 121.0075] }
+                ];
+
+                venues.forEach(venue => {
+                    const marker = L.marker(venue.coords)
+                        .on('click', () => {
+                            const infoPanel = document.getElementById('info-panel');
+                            const isCurrentlyOpen = infoPanel.style.right === '0px';
+                            
+                            document.getElementById('info-content').innerHTML = `
+                                <h3>${venue.name}</h3>
+                                <p><strong>Type:</strong> Sports Venue</p>
+                                <p><strong>Location:</strong> ${venue.coords[0].toFixed(4)}, ${venue.coords[1].toFixed(4)}</p>
+                                <p><strong>Facilities:</strong></p>
+                                <ul>
+                                    <li>Basketball Court</li>
+                                    <li>Seating Area</li>
+                                    <li>Lighting System</li>
+                                </ul>
+                            `;
+                            
+                            // Toggle panel visibility
+                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            isInfoPanelOpen = !isCurrentlyOpen;
+                        })
+                        .addTo(map);
+                    
+                    const label = L.marker(venue.coords, {
+                        icon: L.divIcon({
+                            className: 'map-label sports-label',
+                            html: `<div>${venue.name}</div>`,
+                            iconSize: [200, 20],
+                            iconAnchor: [100, 0]
+                        })
+                    }).addTo(map);
+                    
+                    sportsMarkers.push({ marker, label });
+                });
+                isSportsVisible = true;
+            }
+        }
+    
+        function toggleCommunityCenters() {
+            if (isCommunityVisible) {
+                // Remove existing markers
+                communityMarkers.forEach(marker => {
+                    marker.marker.remove();
+                    marker.label.remove();
+                });
+                communityMarkers = [];
+                isCommunityVisible = false;
+            } else {
+                // Community center locations
+                const centers = [
+                    { name: '3S Center Marulas', coords: [14.67611, 120.98417] }
+                ];
+
+                // Add markers
+                centers.forEach(center => {
+                    const marker = L.marker(center.coords)
+                        .on('click', () => {
+                            const infoPanel = document.getElementById('info-panel');
+                            const isCurrentlyOpen = infoPanel.style.right === '0px';
+                            
+                            document.getElementById('info-content').innerHTML = `
+                                <h3>${center.name}</h3>
+                                <p><strong>Type:</strong> Community Center</p>
+                                <p><strong>Location:</strong> ${center.coords[0].toFixed(4)}, ${center.coords[1].toFixed(4)}</p>
+                                <p><strong>Facilities:</strong></p>
+                                <ul>
+                                    <li>Meeting Rooms</li>
+                                    <li>Community Services</li>
+                                    <li>Information Center</li>
+                                </ul>
+                            `;
+                            
+                            // Toggle panel visibility
+                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            isInfoPanelOpen = !isCurrentlyOpen;
+                        })
+                        .addTo(map);
+                    
+                    const label = L.marker(center.coords, {
+                        icon: L.divIcon({
+                            className: 'map-label community-label',
+                            html: `<div>${center.name}</div>`,
+                            iconSize: [150, 20],
+                            iconAnchor: [75, 0]
+                        })
+                    }).addTo(map);
+                    
+                    communityMarkers.push({ marker, label });
+                });
+                isCommunityVisible = true;
+            }
+        }
+        // Function to close the info panel
+        function closeInfoPanel() {
+            document.getElementById('info-panel').style.right = '-300px';
+            isInfoPanelOpen = false;
+        }
+        
+        // Dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.map-dropdown-btn');
+            const dropdownContent = document.querySelector('.map-dropdown-content');
+            const mapButtons = document.querySelectorAll('.map-btn');
+            
+            dropdownBtn.addEventListener('click', function() {
+                dropdownContent.classList.toggle('show');
+            });
+            
+            // Close the dropdown if clicked outside
+            window.addEventListener('click', function(event) {
+                if (!event.target.matches('.map-dropdown-btn') && 
+                    !event.target.closest('.map-dropdown-btn')) {
+                    if (dropdownContent.classList.contains('show')) {
+                        dropdownContent.classList.remove('show');
+                    }
+                }
+            });
+            
+            // Add click handlers for all map buttons to toggle active state
+            mapButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Get the function name from onclick attribute
+                    const functionName = this.getAttribute('onclick').replace('()', '');
+                    
+                    // Toggle active class based on the corresponding visibility variable
+                    switch(functionName) {
+                        case 'toggleEvacuationCenters':
+                            this.classList.toggle('active', isEvacuationVisible);
+                            break;
+                        case 'toggleFloodProne':
+                            this.classList.toggle('active', isFloodVisible);
+                            break;
+                        case 'toggleEmergencyFacilities':
+                            this.classList.toggle('active', isFacilitiesVisible);
+                            break;
+                        case 'toggleMedicalFacilities':
+                            this.classList.toggle('active', isMedicalVisible);
+                            break;
+                        case 'toggleSchools':
+                            this.classList.toggle('active', isSchoolsVisible);
+                            break;
+                        case 'toggleSportsVenues':
+                            this.classList.toggle('active', isSportsVisible);
+                            break;
+                        case 'toggleCommunityCenters':
+                            this.classList.toggle('active', isCommunityVisible);
+                            break;
+                    }
+                });
+            });
+        });
+        
+        function toggleValenzuelaBoundary() {
+            if (isValenzuelaBoundaryVisible) {
+                // Remove existing boundary
+                if (valenzuelaBoundary) {
+                    valenzuelaBoundary.remove();
+                    valenzuelaBoundary = null;
+                }
+                isValenzuelaBoundaryVisible = false;
+            } else {
+                // Define Valenzuela City boundary coordinates (approximate)
+                const valenzuelaCoords = [
+                    [14.7310, 120.9650], // Northwest corner
+                    [14.7350, 121.0200], // Northeast corner
+                    [14.6550, 121.0250], // Southeast corner
+                    [14.6500, 120.9700], // Southwest corner
+                    [14.7310, 120.9650]  // Back to start to close the polygon
+                ];
+
+                // Add polygon overlay for Valenzuela City
+                valenzuelaBoundary = L.polygon(valenzuelaCoords, {
+                    color: '#FF9800',      // Orange border
+                    weight: 4,             // Thicker border
+                    fillColor: '#FFC107',  // Amber fill
+                    fillOpacity: 0.2,      // Semi-transparent fill
+                    dashArray: '5, 10'     // Dashed line for the border
+                }).bindPopup('Valenzuela City, Philippines').addTo(map);
+                
+                isValenzuelaBoundaryVisible = true;
+            }
+            
+            // Update button active state
+            document.querySelector('.map-btn[onclick="toggleValenzuelaBoundary()"]').classList.toggle('active', isValenzuelaBoundaryVisible);
+        }
+        
+        // Initialize with Valenzuela boundary visible
+        toggleValenzuelaBoundary();
+        
+        // Dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.map-dropdown-btn');
+            const dropdownContent = document.querySelector('.map-dropdown-content');
+            const mapButtons = document.querySelectorAll('.map-btn');
+            
+            // Set initial active state for Valenzuela boundary button
+            document.querySelector('.map-btn[onclick="toggleValenzuelaBoundary()"]').classList.add('active');
+            
+            dropdownBtn.addEventListener('click', function() {
+                dropdownContent.classList.toggle('show');
+            });
+            
+            // Close the dropdown if clicked outside
+            window.addEventListener('click', function(event) {
+                if (!event.target.matches('.map-dropdown-btn') && 
+                    !event.target.closest('.map-dropdown-btn')) {
+                    if (dropdownContent.classList.contains('show')) {
+                        dropdownContent.classList.remove('show');
+                    }
+                }
+            });
+            
+            // Add click handlers for all map buttons to toggle active state
+            mapButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Get the function name from onclick attribute
+                    const functionName = this.getAttribute('onclick').replace('()', '');
+                    
+                    // Toggle active class based on the corresponding visibility variable
+                    switch(functionName) {
+                        case 'toggleValenzuelaBoundary':
+                            this.classList.toggle('active', isValenzuelaBoundaryVisible);
+                            break;
+                        case 'toggleEvacuationCenters':
+                            this.classList.toggle('active', isEvacuationVisible);
+                            break;
+                        case 'toggleFloodProne':
+                            this.classList.toggle('active', isFloodVisible);
+                            break;
+                        case 'toggleEmergencyFacilities':
+                            this.classList.toggle('active', isFacilitiesVisible);
+                            break;
+                        case 'toggleMedicalFacilities':
+                            this.classList.toggle('active', isMedicalVisible);
+                            break;
+                        case 'toggleSchools':
+                            this.classList.toggle('active', isSchoolsVisible);
+                            break;
+                        case 'toggleSportsVenues':
+                            this.classList.toggle('active', isSportsVisible);
+                            break;
+                        case 'toggleCommunityCenters':
+                            this.classList.toggle('active', isCommunityVisible);
+                            break;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+        
+    
