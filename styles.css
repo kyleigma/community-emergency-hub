@@ -19,6 +19,60 @@
     font-style: normal;
 }
 
+/* Font declarations */
+@font-face {
+    font-family: 'Helvetica';
+    src: url('assets/fonts/helvetica/Helvetica.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Helvetica';
+    src: url('assets/fonts/helvetica/Helvetica-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Helvetica';
+    src: url('assets/fonts/helvetica/Helvetica-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* Add Couture font for headings */
+@font-face {
+    font-family: 'Couture';
+    src: url('assets/fonts/couture/couture-bld.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Font assignments */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Couture', Arial, sans-serif;
+    letter-spacing: 1px;
+}
+
+.subtitle, .nav-text, .footer-section h3 {
+    font-family: 'Coolvetica', Arial, sans-serif;
+}
+
+body, p, a, button, span, div, .btn-primary, .btn-interactive {
+    font-family: 'Helvetica', Arial, sans-serif;
+}
+
+/* Remove the general font assignment that was overriding everything */
+body {
+    font-family: 'Helvetica', Arial, sans-serif;
+}
+
+/* Make sure all text elements use Helvetica */
+h1, h2, h3, h4, h5, h6, p, a, button, span, div {
+    font-family: 'Helvetica', Arial, sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -40,28 +94,165 @@ body {
     gap: 1rem;
 }
 
+/* Header and Navigation Styles */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background-color: white;
+}
+
 .logo {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: white;
+    transform: scale(1.3);
+    margin-left: 0.5rem;
 }
 
 .logo img {
-    height: 40px;
+    height: 55px;
 }
 
-.nav-text {
-    color: black;
-    font-size: 1.2rem;
+.fdpr-text {
+    color: #003366;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+/* Responsive Navigation */
+@media screen and (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 0.75rem;
+    }
+    
+    .logo {
+        margin-bottom: 0.75rem;
+        transform: scale(1.1);
+    }
+    
+    .nav-text {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .nav-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+    
+    .nav-buttons a {
+        width: 100%;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        max-width: none;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+}
+
+/* Button Gradient Styles */
+/* Clean up duplicate button styles */
+.btn-primary, .btn-interactive {
+    background: linear-gradient(to right, #FF0000, #FF8C00);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
     text-align: center;
 }
 
-.nav-buttons {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
+.btn-primary:hover, .btn-interactive:hover {
+    background: linear-gradient(to right, #E60000, #E67E00);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Add hamburger menu styles */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+}
+
+.menu-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: #003366;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Responsive Navigation */
+@media screen and (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+    
+    .navbar {
+        flex-direction: column;
+        padding: 0.75rem;
+    }
+    
+    .logo {
+        margin-bottom: 0.75rem;
+        transform: scale(1.1);
+    }
+    
+    .nav-text {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .nav-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+        display: none;
+        padding-top: 10px;
+    }
+    
+    .nav-buttons.active {
+        display: flex;
+    }
+    
+    .nav-buttons a {
+        width: 100%;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        max-width: none;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    /* Hamburger menu animation */
+    .menu-toggle.active span:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+    }
+    
+    .menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .menu-toggle.active span:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+    }
 }
 
 @media screen and (max-width: 992px) {
@@ -181,4 +372,266 @@ h1 {
 
 .btn-interactive:hover {
     background-color: darkred;
+}
+
+
+/* Footer Styles */
+.site-footer {
+    background-color: #2c3e50;
+    color: #fff;
+    padding: 40px 0 20px;
+    margin-top: 50px;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 300px;
+    margin-bottom: 30px;
+    padding: 0 15px;
+}
+
+.footer-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #FF4444;
+}
+
+.footer-divider {
+    border: none;
+    height: 2px;
+    background-color: #FF4444;
+    margin-bottom: 20px;
+    width: 60px;
+}
+
+.footer-section p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.footer-section i {
+    margin-right: 10px;
+    color: #FF4444;
+}
+
+.social-icons {
+    margin-top: 20px;
+}
+
+.social-icons a {
+    display: inline-block;
+    margin-right: 15px;
+    color: #fff;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #FF4444;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+@media screen and (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+    }
+    
+    .footer-section {
+        margin-bottom: 30px;
+    }
+}
+
+/* Add these styles to connect the main section and footer */
+.hero-section {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.site-footer {
+    margin-top: -1px; /* This creates a slight overlap to ensure no gap */
+    padding-top: 40px;
+}
+
+/* If you already have a margin-top on the footer, you can remove it */
+
+/* Font Styles */
+.helvetica-text {
+    font-family: 'Helvetica', Arial, sans-serif !important;
+    font-weight: bold;
+}
+
+.inter-font {
+    font-family: 'Inter', sans-serif;
+}
+
+.coolvetica-font {
+    font-family: 'Coolvetica', Arial, sans-serif;
+}
+
+/* Font definitions */
+@font-face {
+    font-family: 'Couture';
+    src: url('fonts/couture-bld.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Coolvetica';
+    src: url('fonts/coolvetica.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Font classes */
+.couture-font {
+    font-family: 'Couture', 'Arial Black', sans-serif;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.coolvetica-font {
+    font-family: 'Coolvetica', Arial, sans-serif;
+}
+
+/* Footer Section Styles */
+.about-section {
+    flex: 2;
+    max-width: 60%;
+    box-sizing: border-box;
+}
+
+.contact-section {
+    flex: 1;
+    max-width: 35%;
+    box-sizing: border-box;
+}
+
+/* Ensure responsive layout for footer sections */
+@media screen and (max-width: 768px) {
+    .about-section,
+    .contact-section {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+
+/* Enlarged main heading */
+.main-heading {
+    font-size: 4rem !important;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+}
+
+/* Enlarged subtitle */
+.subtitle {
+    font-size: 2rem !important;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    font-weight: bold;
+}
+
+/* Enlarged interactive button */
+.btn-interactive {
+    padding: 18px 36px !important;
+    font-size: 1.5rem !important;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .main-heading {
+        font-size: 3rem !important;
+    }
+    
+    .subtitle {
+        font-size: 1.5rem !important;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-interactive {
+        padding: 15px 30px !important;
+        font-size: 1.3rem !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .main-heading {
+        font-size: 2.5rem !important;
+    }
+    
+    .subtitle {
+        font-size: 1.2rem !important;
+    }
+}
+
+
+/* Button gradient styles */
+.btn-primary, .btn-interactive {
+    background: linear-gradient(to right, #FF0000, #FF8C00);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .btn-interactive:hover {
+    background: linear-gradient(to right, #E60000, #E67E00);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Updated font definitions with normal style */
+.couture-font {
+    font-family: 'Couture', 'Arial Black', sans-serif !important;
+    letter-spacing: 1px;
+    font-style: normal !important;
+}
+
+.coolvetica-font {
+    font-family: 'Coolvetica', Arial, sans-serif;
+}
+
+/* Override any existing background-color on hover */
+.btn-interactive:hover {
+    background: linear-gradient(to right, #E60000, #E67E00);
+}
+
+@font-face {
+    font-family: 'Couture';
+    src: url('assets/fonts/couture-bld.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+.couture-font {
+    font-family: 'Couture', 'Arial Black', sans-serif;
+    letter-spacing: 1px;
+    font-style: normal;
 }

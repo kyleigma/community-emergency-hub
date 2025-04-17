@@ -117,6 +117,40 @@
             
             mobileMenu.addEventListener('click', function() {
                 sidebar.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!sidebar.contains(event.target) && !mobileMenu.contains(event.target) && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                }
+            });
+
+            // Handle touch swipe to close sidebar
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            sidebar.addEventListener('touchstart', function(event) {
+                touchStartX = event.touches[0].clientX;
+            });
+            
+            sidebar.addEventListener('touchend', function(event) {
+                touchEndX = event.changedTouches[0].clientX;
+                if (touchStartX > touchEndX && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                }
+            });
+        });
+    </script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const sidebar = document.getElementById('sidebar');
+            
+            mobileMenu.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
             });
         });
     </script>
