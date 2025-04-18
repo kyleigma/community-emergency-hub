@@ -64,14 +64,86 @@
         // Variable to track if info panel is open
         let isInfoPanelOpen = false;
 
-        // Function to create a marker with popup
+        // Function to create a marker with popup and hover effect
         function createMarker(lat, lng, title, description, icon) {
             const marker = L.marker([lat, lng], {
                 icon: icon
             });
-            marker.bindPopup(`<div class="marker-popup"><h3>${title}</h3><p>${description}</p></div>`);
+
+            // Create a tooltip with the description
+            marker.bindTooltip(`<div class="marker-tooltip"><h3>${title}</h3><p>${description}</p></div>`, {
+                direction: 'auto',
+                offset: L.point(0, -30),
+                className: 'custom-tooltip',
+                opacity: 0.9
+            });
+
+            // Show tooltip on hover
+            marker.on('mouseover', function(e) {
+                this.openTooltip();
+            });
+
+            // Hide tooltip when mouse leaves
+            marker.on('mouseout', function(e) {
+                this.closeTooltip();
+            });
+
+            // Enhanced popup functionality for click events with auto-positioning
+            const popup = L.popup({
+                maxWidth: 300,
+                minWidth: 200,
+                autoPan: true,
+                autoPanPadding: [50, 50],
+                className: 'custom-popup'
+            }).setContent(`<div class="marker-popup"><h3>${title}</h3><p>${description}</p></div>`);
+
+            marker.bindPopup(popup);
+
             return marker;
         }
+
+        // Add custom CSS for better popup visibility
+        const style = document.createElement('style');
+        style.textContent = `
+            .custom-popup {
+                font-family: Arial, sans-serif;
+            }
+            .custom-popup .leaflet-popup-content-wrapper {
+                border-radius: 8px;
+                box-shadow: 0 3px 14px rgba(0,0,0,0.2);
+            }
+            .custom-popup .leaflet-popup-content {
+                margin: 13px;
+                line-height: 1.4;
+            }
+            .custom-popup .leaflet-popup-tip-container {
+                margin-top: -1px;
+            }
+            .marker-popup h3 {
+                margin: 0 0 10px 0;
+                color: #333;
+            }
+            .marker-popup p {
+                margin: 0;
+                color: #666;
+            }
+            @media (max-width: 768px) {
+                .custom-popup {
+                    position: fixed !important;
+                    bottom: 20px !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    width: 90% !important;
+                    max-width: 300px !important;
+                }
+                .custom-popup .leaflet-popup-content-wrapper {
+                    border-radius: 12px !important;
+                    max-height: 80vh !important;
+                    overflow-y: auto !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
 
         // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -258,7 +330,7 @@
                             `;
 
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
@@ -329,7 +401,7 @@
                             `;
 
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
@@ -421,7 +493,7 @@
                             `;
 
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
@@ -498,7 +570,7 @@
                             `;
 
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
@@ -557,7 +629,7 @@
                             `;
 
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
@@ -581,7 +653,7 @@
         }
         // Function to close the info panel
         function closeInfoPanel() {
-            document.getElementById('info-panel').style.right = '-300px';
+            document.getElementById('info-panel').style.right = '0px';
             isInfoPanelOpen = false;
         }
 
