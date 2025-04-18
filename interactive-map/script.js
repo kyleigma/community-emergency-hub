@@ -83,4 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownContent.classList.remove('show');
         }
     });
+
+    marker.on('click', function() {
+        // Remove active class from all markers
+        evacuationMarkers.forEach(m => {
+            m.marker.getElement().classList.remove('active');
+        });
+        // Add active class to clicked marker
+        this.getElement().classList.add('active');
+    });
 });

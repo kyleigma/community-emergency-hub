@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +10,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="responsive-nav.css">
     <!-- Replace the current Couture font link with this one -->
-    <link href="https://www.dafontfree.net/embed/Y291dHVyZS1ib2xkJmRhdGEvMjUvYy8xMjg3MjUvQ291dHVyZS1Cb2xkLm90Zg" rel="stylesheet" type="text/css"/>
+    <link href="https://www.dafontfree.net/embed/Y291dHVyZS1ib2xkJmRhdGEvMjUvYy8xMjg3MjUvQ291dHVyZS1Cb2xkLm90Zg" rel="stylesheet" type="text/css" />
     <link href="https://fonts.cdnfonts.com/css/coolvetica" rel="stylesheet">
 
 </head>
+
 <body>
     <header class="sticky-header">
         <nav class="navbar">
@@ -51,7 +53,7 @@
                 <hr class="footer-divider">
                 <p class="coolvetica-font">The Community Emergency Hub is dedicated to providing essential emergency information and resources to the residents of Valenzuela City. Our mission is to help the community stay prepared and informed during emergencies.</p>
             </div>
-            
+
             <div class="footer-section contact-section">
                 <h3 class="couture-font">CONTACT US</h3>
                 <hr class="footer-divider">
@@ -69,17 +71,54 @@
             <p>&copy; 2023 Community Emergency Hub. All Rights Reserved.</p>
         </div>
     </footer>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenu = document.getElementById('mobile-menu');
             const navMenu = document.getElementById('nav-menu');
-            
+
             mobileMenu.addEventListener('click', function() {
                 mobileMenu.classList.toggle('active');
                 navMenu.classList.toggle('active');
             });
         });
     </script>
+    <style>
+        /* Add this CSS to fix mobile map marker glitch */
+        
+        @media screen and (max-width: 768px) {
+            .leaflet-popup {
+                position: fixed !important;
+                bottom: 80px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 90% !important;
+                max-width: 300px !important;
+                top: auto !important;
+                margin: 0 !important;
+                z-index: 1000 !important;
+            }
+            .leaflet-popup-content-wrapper {
+                border-radius: 12px !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+                background: white !important;
+                padding: 15px !important;
+            }
+            .leaflet-popup-content {
+                margin: 0 !important;
+                padding: 5px !important;
+            }
+            .leaflet-popup-close-button {
+                top: 10px !important;
+                right: 10px !important;
+                z-index: 1000 !important;
+                padding: 5px !important;
+            }
+            .leaflet-popup-tip-container {
+                display: none !important;
+            }
+        }
+    </style>
 </body>
+
 </html>

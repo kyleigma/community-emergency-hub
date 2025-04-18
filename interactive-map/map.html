@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </head>
+
 <body>
     <div class="container">
         <aside class="sidebar">
             <div class="logo">
                 <h1>COMMUNITY<br>EMERGENCY HUB</h1>
             </div>
-            
+
             <div class="tools">
                 <h2>TOOLS</h2>
                 <ul>
@@ -58,11 +60,90 @@
     <script>
         // Initialize the map centered on Valenzuela City
         const map = L.map('map').setView([14.6950, 120.9975], 13);
-        
+
         // Variable to track if info panel is open
         let isInfoPanelOpen = false;
-        
 
+        // Function to create a marker with popup and hover effect
+        function createMarker(lat, lng, title, description, icon) {
+            const marker = L.marker([lat, lng], {
+                icon: icon
+            });
+
+            // Create a tooltip with the description
+            marker.bindTooltip(`<div class="marker-tooltip"><h3>${title}</h3><p>${description}</p></div>`, {
+                direction: 'auto',
+                offset: L.point(0, -30),
+                className: 'custom-tooltip',
+                opacity: 0.9
+            });
+
+            // Show tooltip on hover
+            marker.on('mouseover', function(e) {
+                this.openTooltip();
+            });
+
+            // Hide tooltip when mouse leaves
+            marker.on('mouseout', function(e) {
+                this.closeTooltip();
+            });
+
+            // Enhanced popup functionality for click events with auto-positioning
+            const popup = L.popup({
+                maxWidth: 300,
+                minWidth: 200,
+                autoPan: true,
+                autoPanPadding: [50, 50],
+                className: 'custom-popup'
+            }).setContent(`<div class="marker-popup"><h3>${title}</h3><p>${description}</p></div>`);
+
+            marker.bindPopup(popup);
+
+            return marker;
+        }
+
+        // Add custom CSS for better popup visibility
+        const style = document.createElement('style');
+        style.textContent = `
+            .custom-popup {
+                font-family: Arial, sans-serif;
+            }
+            .custom-popup .leaflet-popup-content-wrapper {
+                border-radius: 8px;
+                box-shadow: 0 3px 14px rgba(0,0,0,0.2);
+            }
+            .custom-popup .leaflet-popup-content {
+                margin: 13px;
+                line-height: 1.4;
+            }
+            .custom-popup .leaflet-popup-tip-container {
+                margin-top: -1px;
+            }
+            .marker-popup h3 {
+                margin: 0 0 10px 0;
+                color: #333;
+            }
+            .marker-popup p {
+                margin: 0;
+                color: #666;
+            }
+            @media (max-width: 768px) {
+                .custom-popup {
+                    position: fixed !important;
+                    bottom: 20px !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    width: 90% !important;
+                    max-width: 300px !important;
+                }
+                .custom-popup .leaflet-popup-content-wrapper {
+                    border-radius: 12px !important;
+                    max-height: 80vh !important;
+                    overflow-y: auto !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
 
         // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -102,7 +183,6 @@
         function toggleEvacuationCenters() {
             const button = document.querySelector('button[onclick="toggleEvacuationCenters()"]');
             if (isEvacuationVisible) {
-                // Remove existing markers
                 evacuationMarkers.forEach(marker => {
                     marker.marker.remove();
                     marker.label.remove();
@@ -111,19 +191,36 @@
                 isEvacuationVisible = false;
                 button.classList.remove('active');
             } else {
-                // Evacuation center locations
-                const centers = [
-                    { name: 'Marulas Central School', coords: [14.6778, 120.9735] },
-                    { name: 'Marulas Elementary School', coords: [14.6762, 120.9751] },
-                    { name: 'Marulas Covered Court', coords: [14.6755, 120.9728] }
-                ];
+                const centers = [{
+                    name: 'Marulas Central School',
+                    coords: [14.6778, 120.9735],
+                    description: 'Primary evacuation center with capacity for 500 people. Facilities include emergency supplies, medical station, and backup power.'
+                }, {
+                    name: 'Marulas Elementary School',
+                    coords: [14.6762, 120.9751],
+                    description: 'Secondary evacuation center equipped with emergency supplies and basic medical facilities. Can accommodate up to 300 people.'
+                }, {
+                    name: 'Marulas Covered Court',
+                    coords: [14.6755, 120.9728],
+                    description: 'Emergency shelter with basic facilities. Used for temporary evacuation during calamities. Capacity: 200 people.'
+                }];
 
-                // Add markers
                 centers.forEach(center => {
-                    const marker = L.marker(center.coords)
-                        .on('click', () => showInfoPanel(center))
-                        .addTo(map);
-                    
+                    const marker = createMarker(
+                        center.coords[0],
+                        center.coords[1],
+                        center.name,
+                        center.description,
+                        L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        })
+                    ).addTo(map);
+
                     const label = L.marker(center.coords, {
                         icon: L.divIcon({
                             className: 'map-label',
@@ -132,8 +229,11 @@
                             iconAnchor: [50, 0]
                         })
                     }).addTo(map);
-                    
-                    evacuationMarkers.push({ marker, label });
+
+                    evacuationMarkers.push({
+                        marker,
+                        label
+                    });
                 });
                 isEvacuationVisible = true;
                 button.classList.add('active');
@@ -197,11 +297,16 @@
                 isFacilitiesVisible = false;
             } else {
                 // Emergency facility locations
-                const facilities = [
-                    { name: 'Valenzuela City Emergency Hospital', coords: [14.6770, 120.9745] },
-                    { name: 'Marulas Fire Station', coords: [14.6758, 120.9738] },
-                    { name: 'Marulas Police Station', coords: [14.6765, 120.9732] }
-                ];
+                const facilities = [{
+                    name: 'Valenzuela City Emergency Hospital',
+                    coords: [14.6770, 120.9745]
+                }, {
+                    name: 'Marulas Fire Station',
+                    coords: [14.6758, 120.9738]
+                }, {
+                    name: 'Marulas Police Station',
+                    coords: [14.6765, 120.9732]
+                }];
 
                 // Add markers
                 facilities.forEach(facility => {
@@ -209,7 +314,7 @@
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
-                            
+
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${facility.name}</h3>
                                 <p><strong>Type:</strong> Emergency Facility</p>
@@ -223,13 +328,13 @@
                                     <li>Emergency Equipment</li>
                                 </ul>
                             `;
-                            
+
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
-                    
+
                     const label = L.marker(facility.coords, {
                         icon: L.divIcon({
                             className: 'map-label facility-label',
@@ -238,13 +343,16 @@
                             iconAnchor: [100, 0]
                         })
                     }).addTo(map);
-                    
-                    facilityMarkers.push({ marker, label });
+
+                    facilityMarkers.push({
+                        marker,
+                        label
+                    });
                 });
                 isFacilitiesVisible = true;
             }
         }
-    
+
         function toggleMedicalFacilities() {
             if (isMedicalVisible) {
                 medicalMarkers.forEach(marker => {
@@ -254,21 +362,32 @@
                 medicalMarkers = [];
                 isMedicalVisible = false;
             } else {
-                const facilities = [
-                    { name: 'Valenzuela Medical Center', coords: [14.68976, 120.97807] },
-                    { name: 'Northern Health Medical and Diagnostic Center', coords: [14.6780, 120.9755] },
-                    { name: 'Healthy Link Medical Clinic & Diagnostic Center', coords: [14.6790, 120.9765] },
-                    { name: 'Fatima University Medical Center', coords: [14.67797, 120.98095] },
-                    { name: 'E. Perlas Diagnostic and Polyclinic', coords: [14.6810, 120.9785] },
-                    { name: 'Calalang General Hospital', coords: [14.67269, 120.98253] }
-                ];
+                const facilities = [{
+                    name: 'Valenzuela Medical Center',
+                    coords: [14.68976, 120.97807]
+                }, {
+                    name: 'Northern Health Medical and Diagnostic Center',
+                    coords: [14.6780, 120.9755]
+                }, {
+                    name: 'Healthy Link Medical Clinic & Diagnostic Center',
+                    coords: [14.6790, 120.9765]
+                }, {
+                    name: 'Fatima University Medical Center',
+                    coords: [14.67797, 120.98095]
+                }, {
+                    name: 'E. Perlas Diagnostic and Polyclinic',
+                    coords: [14.6810, 120.9785]
+                }, {
+                    name: 'Calalang General Hospital',
+                    coords: [14.67269, 120.98253]
+                }];
 
                 facilities.forEach(facility => {
                     const marker = L.marker(facility.coords)
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
-                            
+
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${facility.name}</h3>
                                 <p><strong>Type:</strong> Medical Facility</p>
@@ -280,13 +399,13 @@
                                     <li>Medical Consultations</li>
                                 </ul>
                             `;
-                            
+
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
-                    
+
                     const label = L.marker(facility.coords, {
                         icon: L.divIcon({
                             className: 'map-label medical-label',
@@ -295,8 +414,11 @@
                             iconAnchor: [100, 0]
                         })
                     }).addTo(map);
-                    
-                    medicalMarkers.push({ marker, label });
+
+                    medicalMarkers.push({
+                        marker,
+                        label
+                    });
                 });
                 isMedicalVisible = true;
             }
@@ -311,28 +433,53 @@
                 schoolMarkers = [];
                 isSchoolsVisible = false;
             } else {
-                const schools = [
-                    { name: 'Valenzuela National High School', coords: [14.6830, 120.9805] },
-                    { name: 'Mapulang Lupa National High School', coords: [14.70172, 121.00936] },
-                    { name: 'Sto. Rosario Montessori School', coords: [14.6840, 120.9815] },
-                    { name: 'St. Peter Velle Technical Training Center', coords: [14.6850, 120.9825] },
-                    { name: 'SKM Christian Academy', coords: [14.6860, 120.9835] },
-                    { name: 'Serrano Elementary School', coords: [14.6870, 120.9845] },
-                    { name: 'San Miguel Heights Elementary School', coords: [14.6880, 120.9855] },
-                    { name: 'Our Lady of Fatima University', coords: [14.67797, 120.98095] },
-                    { name: 'Vicente P. Trinidad National High School', coords: [14.7053, 120.9542] },
-                    { name: 'St. Gregory College of Valenzuela', coords: [14.6900, 120.9875] },
-                    { name: 'Gen. T. de Leon National High School', coords: [14.6910, 120.9885] },
-                    { name: 'Parada National High School', coords: [14.6920, 120.9895] },
-                    { name: 'St. Louis College Valenzuela', coords: [14.6930, 120.9905] }
-                ];
+                const schools = [{
+                    name: 'Valenzuela National High School',
+                    coords: [14.6830, 120.9805]
+                }, {
+                    name: 'Mapulang Lupa National High School',
+                    coords: [14.70172, 121.00936]
+                }, {
+                    name: 'Sto. Rosario Montessori School',
+                    coords: [14.6840, 120.9815]
+                }, {
+                    name: 'St. Peter Velle Technical Training Center',
+                    coords: [14.6850, 120.9825]
+                }, {
+                    name: 'SKM Christian Academy',
+                    coords: [14.6860, 120.9835]
+                }, {
+                    name: 'Serrano Elementary School',
+                    coords: [14.6870, 120.9845]
+                }, {
+                    name: 'San Miguel Heights Elementary School',
+                    coords: [14.6880, 120.9855]
+                }, {
+                    name: 'Our Lady of Fatima University',
+                    coords: [14.67797, 120.98095]
+                }, {
+                    name: 'Vicente P. Trinidad National High School',
+                    coords: [14.7053, 120.9542]
+                }, {
+                    name: 'St. Gregory College of Valenzuela',
+                    coords: [14.6900, 120.9875]
+                }, {
+                    name: 'Gen. T. de Leon National High School',
+                    coords: [14.6910, 120.9885]
+                }, {
+                    name: 'Parada National High School',
+                    coords: [14.6920, 120.9895]
+                }, {
+                    name: 'St. Louis College Valenzuela',
+                    coords: [14.6930, 120.9905]
+                }];
 
                 schools.forEach(school => {
                     const marker = L.marker(school.coords)
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
-                            
+
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${school.name}</h3>
                                 <p><strong>Type:</strong> Educational Institution</p>
@@ -344,13 +491,13 @@
                                     <li>Computer Laboratory</li>
                                 </ul>
                             `;
-                            
+
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
-                    
+
                     const label = L.marker(school.coords, {
                         icon: L.divIcon({
                             className: 'map-label school-label',
@@ -359,8 +506,11 @@
                             iconAnchor: [100, 0]
                         })
                     }).addTo(map);
-                    
-                    schoolMarkers.push({ marker, label });
+
+                    schoolMarkers.push({
+                        marker,
+                        label
+                    });
                 });
                 isSchoolsVisible = true;
             }
@@ -375,23 +525,38 @@
                 sportsMarkers = [];
                 isSportsVisible = false;
             } else {
-                const venues = [
-                    { name: 'THOA Wild Center', coords: [14.7040, 121.0015] },
-                    { name: 'Potrero Covered Court', coords: [14.7050, 121.0025] },
-                    { name: 'Parish of the Holy Cross Basketball Court', coords: [14.7060, 121.0035] },
-                    { name: 'Manotoc Basketball Court', coords: [14.68306, 120.97972] },
-                    { name: 'Lena Subdivision Basketball Court', coords: [14.70916, 120.96404] },
-                    { name: 'D.E.V. Basketball Court', coords: [14.71319, 120.96444] },
-                    { name: 'Basketball Court at 33 Filomina', coords: [14.7090, 121.0065] },
-                    { name: 'Elysian Court', coords: [14.7100, 121.0075] }
-                ];
+                const venues = [{
+                    name: 'THOA Wild Center',
+                    coords: [14.7040, 121.0015]
+                }, {
+                    name: 'Potrero Covered Court',
+                    coords: [14.7050, 121.0025]
+                }, {
+                    name: 'Parish of the Holy Cross Basketball Court',
+                    coords: [14.7060, 121.0035]
+                }, {
+                    name: 'Manotoc Basketball Court',
+                    coords: [14.68306, 120.97972]
+                }, {
+                    name: 'Lena Subdivision Basketball Court',
+                    coords: [14.70916, 120.96404]
+                }, {
+                    name: 'D.E.V. Basketball Court',
+                    coords: [14.71319, 120.96444]
+                }, {
+                    name: 'Basketball Court at 33 Filomina',
+                    coords: [14.7090, 121.0065]
+                }, {
+                    name: 'Elysian Court',
+                    coords: [14.7100, 121.0075]
+                }];
 
                 venues.forEach(venue => {
                     const marker = L.marker(venue.coords)
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
-                            
+
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${venue.name}</h3>
                                 <p><strong>Type:</strong> Sports Venue</p>
@@ -403,13 +568,13 @@
                                     <li>Lighting System</li>
                                 </ul>
                             `;
-                            
+
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
-                    
+
                     const label = L.marker(venue.coords, {
                         icon: L.divIcon({
                             className: 'map-label sports-label',
@@ -418,13 +583,16 @@
                             iconAnchor: [100, 0]
                         })
                     }).addTo(map);
-                    
-                    sportsMarkers.push({ marker, label });
+
+                    sportsMarkers.push({
+                        marker,
+                        label
+                    });
                 });
                 isSportsVisible = true;
             }
         }
-    
+
         function toggleCommunityCenters() {
             if (isCommunityVisible) {
                 // Remove existing markers
@@ -436,9 +604,10 @@
                 isCommunityVisible = false;
             } else {
                 // Community center locations
-                const centers = [
-                    { name: '3S Center Marulas', coords: [14.67611, 120.98417] }
-                ];
+                const centers = [{
+                    name: '3S Center Marulas',
+                    coords: [14.67611, 120.98417]
+                }];
 
                 // Add markers
                 centers.forEach(center => {
@@ -446,7 +615,7 @@
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
-                            
+
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${center.name}</h3>
                                 <p><strong>Type:</strong> Community Center</p>
@@ -458,13 +627,13 @@
                                     <li>Information Center</li>
                                 </ul>
                             `;
-                            
+
                             // Toggle panel visibility
-                            infoPanel.style.right = isCurrentlyOpen ? '-300px' : '0';
+                            infoPanel.style.right = isCurrentlyOpen ? '0px' : '0';
                             isInfoPanelOpen = !isCurrentlyOpen;
                         })
                         .addTo(map);
-                    
+
                     const label = L.marker(center.coords, {
                         icon: L.divIcon({
                             className: 'map-label community-label',
@@ -473,15 +642,18 @@
                             iconAnchor: [75, 0]
                         })
                     }).addTo(map);
-                    
-                    communityMarkers.push({ marker, label });
+
+                    communityMarkers.push({
+                        marker,
+                        label
+                    });
                 });
                 isCommunityVisible = true;
             }
         }
         // Function to close the info panel
         function closeInfoPanel() {
-            document.getElementById('info-panel').style.right = '-300px';
+            document.getElementById('info-panel').style.right = '0px';
             isInfoPanelOpen = false;
         }
 
@@ -509,10 +681,7 @@
                 });
             }
         });
-        
-
     </script>
 </body>
+
 </html>
-        
-    

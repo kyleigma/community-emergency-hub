@@ -129,6 +129,57 @@ body {
         flex-direction: column;
     }
 
+    .sidebar {
+        position: fixed;
+        left: -250px;
+        height: 100vh;
+        z-index: 999;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .content {
+        padding: 1rem;
+        margin-left: 0;
+    }
+
+    .content h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .bandage-items {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .bandage-card {
+        margin-bottom: 1rem;
+    }
+
+    .bandage-card img {
+        height: auto;
+    }
+
+    .bandage-info h2 {
+        font-size: 1.2rem;
+    }
+
+    .bandage-info p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    .container {
+        flex-direction: column;
+    }
+
     .menu-toggle {
         display: block;
     }
