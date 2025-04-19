@@ -70,6 +70,7 @@ body {
 @media screen and (max-width: 768px) {
     .container {
         flex-direction: column;
+        padding-top: 3rem;
     }
 
     .menu-toggle {
@@ -79,11 +80,12 @@ body {
     .sidebar {
         position: fixed;
         top: 0;
-        left: -250px;
+        left: -100%;
         height: 100vh;
         width: 250px;
         z-index: 999;
         padding: 1rem;
+        transition: left 0.3s ease;
     }
 
     .sidebar.active {
