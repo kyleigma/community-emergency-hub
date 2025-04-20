@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>First Aid - Bandaging 101</title>
+    <link rel="icon" type="image/png" href="../fdpr-logo.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -30,16 +31,20 @@
         </aside>
 
         <main class="content">
-            <h1>BANDAGING 101</h1>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="bandaging">BANDAGING 101</button>
+                <button class="tab-btn" data-tab="disaster">DISASTER WATER WAIS</button>
+            </div>
             
-            <div class="bandage-items">
+            <div class="tab-content" id="bandaging-tab" style="display: block;">
+                <div class="bandage-items">
                 <div class="bandage-card">
                     <a href="https://www.youtube.com/watch?v=sjWRW-sAh7k&list=PLik8anFhmFAv9KFe2B6umpNMcjHgizqti&index=2" target="_blank">
                         <img src="https://img.youtube.com/vi/sjWRW-sAh7k/maxresdefault.jpg" alt="Elbow Bandaging Tutorial">
                     </a>
                     <div class="bandage-info">
                         <h2>Elbow</h2>
-                        <p>A figure-eight method to support the joint, reduce swelling, or protect a wound. The bandage should be snug but not tight, maintaining circulation while allowing limited movement. Commonly used for sprains, strains, and post surgical care.</p>
+                        <p>A figure-eight method to support the joint, reduce swelling, or protect a wound. The bandage should be snug but not fight, maintaining circulation while allowing limited movement. Commonly used for sprains, abrasions, or post-surgical care.</p>
                     </div>
                 </div>
 
@@ -107,6 +112,61 @@
                     </div>
                 </div>
             </div>
+            </div>
+            
+            <div class="tab-content" id="disaster-tab" style="display: none;">                
+                <div class="bandage-items">
+                    <div class="bandage-card">
+                        <a href="https://www.youtube.com/watch?v=V_qXUHoE08I&t=2s" target="_blank">
+                            <img src="https://img.youtube.com/vi/V_qXUHoE08I/maxresdefault.jpg" alt="Go Bag">
+                        </a> 
+                        <div class="bandage-info"> 
+                            <h2>Go Bag</h2>
+                            <p>The Philippine Red Cross marks National Disaster Resilience Month this July with "Disaster Wais Series"-videos highlighting the importance of disaster preparedness.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bandage-card">
+                        <a href="https://www.youtube.com/watch?v=319yhPzHRLk&t=3s" target="_blank">
+                            <img src="https://img.youtube.com/vi/319yhPzHRLk/maxresdefault.jpg" alt="Shelter">
+                        </a>
+                        <div class="bandage-info">  
+                            <h2>Shelter</h2>
+                            <p>In Episode 2. "Shelter, learn how the Red Cross has been providing houses,including sustainable, solar-powered homes, to disaster-stricken communities.The Red Cross also conducts safe shelter awareness training for the housing beneficiaries.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bandage-card">
+                        <a href="https://www.youtube.com/watch?v=p7iC6bWgkbc" target="_blank">
+                            <img src="https://img.youtube.com/vi/p7iC6bWgkbc/maxresdefault.jpg" alt="Nature-Based Solutions">
+                        </a> 
+                        <div class="bandage-info">
+                            <h2>Nature-Based Solutions</h2>
+                            <p>Episode 3. "Nature-Based Solutions," explores various natural ways of protecting the earth from effects of climate change. The Philippine Red Cross employs community-led approaches to safeguard the environment and enhance human resilience against disasters. Learn how nature can be our greatest ally.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bandage-card">
+                        <a href="https://www.youtube.com/watch?v=CdU9QIl01-o" target="_blank">
+                            <img src="shelter.jpg" alt="Anticiptory Action">
+                        </a> 
+                        <div class="bandage-info">
+                            <h2>Anticipatory Action</h2>
+                            <p>In Episode 4, “Anticipatory Action," learn how a system of predicting the impact of a coming storm can reduce the loss of lives, loss of livelihood, and damage to houses.</p>
+                        </div>
+                    </div>
+
+                    <div class="bandage-card">
+                        <a href="https://youtu.be/SO9LTqWy0E0?si=RLOhzzUDt4tFowKD" target="_blank">
+                            <img src="https://img.youtube.com/vi/SO9LTqWy0E0/maxresdefault.jpg" alt="Flood Resilience">
+                        </a>
+                        <div class="bandage-info"> 
+                            <h2>Flood Resilience</h2>
+                            <p>In Episode 5, “Flood Resilience,” watch how the Philippine Red Cross supervises Barangay Manggahan in Pasig in tackling and strengthening the ways to deal with disasters, with the support of International Federation of Red Cross and Red Crescent Societies (IFRC) and Zurich Flood Resilience Alliance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
     
@@ -114,7 +174,29 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenu = document.getElementById('mobile-menu');
             const sidebar = document.getElementById('sidebar');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
             
+            // Tab switching functionality
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // Show the selected tab content
+                    const tabId = btn.getAttribute('data-tab');
+                    document.getElementById(tabId + '-tab').style.display = 'block';
+                });
+            });
+            
+            // Mobile menu functionality
             mobileMenu.addEventListener('click', function() {
                 sidebar.classList.toggle('active');
                 mobileMenu.classList.toggle('active');

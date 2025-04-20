@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map - Community Emergency Hub</title>
+    <link rel="icon" type="image/png" href="../fdpr-logo.png">
     <link rel="stylesheet" href="styles.css">
     <!-- Include Leaflet CSS and JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -129,8 +130,15 @@
 
         // Function to create a marker with popup and hover effect
         function createMarker(lat, lng, title, description, icon) {
+            const customIcon = L.icon({
+                iconUrl: icon || 'fdpr-red.png',
+                iconSize: [45, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [0, -41],
+                className: 'custom-marker-icon'
+            });
             const marker = L.marker([lat, lng], {
-                icon: icon
+                icon: customIcon
             });
         
             // Create a tooltip with the description
@@ -285,41 +293,53 @@
             } else {
                 const facilities = [{
                     name: 'Fatima University Medical Center',
+                    address: '120 MacArthur Hwy, Valenzuela, 1440 Metro Manila',
                     coords: [14.67797, 120.98095],
-                    description: 'A comprehensive medical center offering 24/7 emergency services with modern facilities and experienced healthcare professionals.',
+                    description: 'Fatima University Medical Center (FUMC) is a tertiary hospital and teaching facility serving as a crucial medical resource in Barangay Marulas. During flood emergencies, FUMC provides critical care and handles both minor injuries and complex medical cases. Its location near major roads makes it accessible for ambulatory services, while its affiliation with Our Lady of Fatima University ensures a steady supply of medical professionals during disaster response operations. FUMC also supports medical missions and relief operations during times of crisis.',
                     images: [
-                        'assets/medical/fatima_1.svg',
-                        'assets/medical/fatima_2.svg',
-                        'assets/medical/fatima_3.svg'
+                        'assets/medical/fatima_1.jpg',
+                        'assets/medical/fatima_2.jpg',
+                        'assets/medical/fatima_3.jpg'
                     ]
                 }, {
                     name: 'E. Perlas Diagnostic and Polyclinic',
+                    address: '93 Pio Valenzuela, Valenzuela, 1440 Metro Manila',
                     coords: [14.6810, 120.9785],
-                    description: 'Specialized diagnostic center with state-of-the-art medical equipment and expert healthcare providers.',
+                    description: 'E. Perlas Diagnostics and Polyclinic is a community-based healthcare provider offering outpatient services and diagnostic support. While not a large-scale hospital, it plays an important role during floods by providing immediate medical attention for minor injuries and health concerns. Its quick response capability, especially in low-level flood events, helps decongest larger hospitals and ensures more widespread medical coverage across the barangay.',
                     images: [
-                        'assets/medical/perlas_1.svg',
-                        'assets/medical/perlas_2.svg',
-                        'assets/medical/perlas_3.svg'
+                        'assets/medical/perlas_1.jfif',
+                        'assets/medical/perlas_2.jpg',
+                        'assets/medical/perlas_3.png'
                     ]
                 }, {
                     name: 'Calalang General Hospital',
+                    address: '4th St, Valenzuela, 1440 Metro Manila',
                     coords: [14.67269, 120.98253],
-                    description: 'Full-service general hospital providing emergency care, specialized treatments, and comprehensive medical services.',
+                    description: 'Calalang General Hospital is a well-established private hospital in the heart of Marulas, equipped to manage a range of medical emergencies. During flood events, it serves as both a treatment facility and a support center for barangay-level disaster response. Its central location and capacity for overnight care make it a reliable option for patients needing continuous observation. The hospital also partners with local government units to coordinate relief and medical assistance during high-risk weather conditions.',
                     images: [
-                        'assets/medical/calalang_1.svg',
-                        'assets/medical/calalang_2.svg',
-                        'assets/medical/calalang_3.svg'
+                        'assets/medical/calalang_1.jfif',
+                        'assets/medical/calalang_2.jpg',
+                        'assets/medical/calalang_3.jpg'
                     ]
                 }];
 
                 facilities.forEach(facility => {
-                    const marker = L.marker(facility.coords)
+                    const marker = L.marker(facility.coords, {
+                        icon: L.icon({
+                            iconUrl: 'fdpr-red.png',
+                            iconSize: [45, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [0, -41],
+                            className: 'custom-marker-icon'
+                        })
+                    })
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
 
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${facility.name}</h3>
+                                <p><strong>Address:</strong> ${facility.address}</p>
                                 <p><strong>Location:</strong> ${facility.coords[0].toFixed(4)}, ${facility.coords[1].toFixed(4)}</p>
                                 <p>${facility.description}</p>
                                 <div class="carousel-container">
@@ -381,32 +401,76 @@
             } else {
                 const schools = [{
                     name: 'Valenzuela National High School',
+                    address: '4 A. Fernando Street, Valenzuela, Metro Manila',
                     coords: [14.6830, 120.9805],
-                    description: 'A comprehensive secondary education institution with modern facilities including a gymnasium that serves as an emergency shelter. Features multiple evacuation points, emergency response equipment, and trained safety personnel.'
+                    description: 'As one of the largest educational institutions in the area, Valenzuela National High School is a major strategic site for flood disaster management. It has the capacity to host large numbers of evacuees and is often used as a central command point during city-wide disaster responses. The school community is actively involved in preparedness campaigns, including student-led initiatives that promote safety awareness and resilience. Its elevated location and ample facilities make it a cornerstone of emergency planning in Marulas.',
+                    images: [
+                        'assets/school/valenzuela_1.png',
+                        'assets/school/valenzuela_2.png',
+                        'assets/school/valenzuela_3.jpg'
+                    ]
                 },{
                     name: 'Serrano Elementary School',
+                    address: 'T. Serrano St, Valenzuela, Metro Manila',
                     coords: [14.6870, 120.9845],
-                    description: 'Primary education center with spacious grounds and covered courts that can be utilized during emergencies. Equipped with first aid stations and emergency communication systems.'
+                    description: 'Serrano Elementary School plays a significant role in the local disaster preparedness framework. Positioned within a residential area, the school is a primary evacuation site for nearby households during flooding events. Its facilities have been used in previous emergencies for shelter and relief operations. With its active school community, Serrano is also a hub for public education on flood safety and emergency response, helping instill preparedness values among students and their families.',
+                    images: [
+                        'assets/school/serrano_1.jpg',
+                        'assets/school/serrano_2.jpg',
+                        'assets/school/serrano_3.jpg'
+                    ]
                 },{
                     name: 'Marulas Central School',
+                    address: 'Pio Valenzuela, Valenzuela, 1440 Metro Manila',
                     coords: [14.67601337707112, 120.98498637949744],
-                    description: 'Well-established elementary school with dedicated emergency assembly areas and disaster preparedness facilities. Regular conduct of emergency drills and safety training programs.'
-                },{
+                    description: 'Marulas Central School is one of the key public institutions in Barangay Marulas and serves as an important facility for community gatherings and disaster response coordination. In times of flooding, the school is designated as an emergency evacuation site due to its central location and spacious facilities. Its accessibility and proximity to main roads make it a vital point in the barangay\'s flood response network. Strengthening disaster preparedness activities here, such as community drills and information campaigns, enhances the overall resilience of the area.',
+                    images: [
+                        'assets/school/marulas_1.jpg',
+                        'assets/school/marulas_2.jpg',
+                        'assets/school/marulas_3.png'
+                    ]
+                    },{
                     name: 'Bitik Elementary School',
+                    address: 'Tamaraw Hills Ext, Valenzuela, Metro Manila',
                     coords: [14.680180922064459, 120.98651613531823],
-                    description: 'Community-focused elementary school with strategic location for emergency response. Features accessible evacuation routes and designated safe zones for various emergency scenarios.'
+                    description: 'Bitik Elementary School serves a densely populated section of Barangay Marulas and is an essential node in the flood disaster response network. Due to its location in a flood-prone zone, the school is critical for early evacuation efforts. It also functions as a temporary shelter during severe weather events. Regular coordination with barangay officials and integration of disaster risk reduction education into the curriculum ensures that Bitik Elementary is always ready to respond in times of need.',
+                    images: [
+                        'assets/school/bitik_1.png',
+                        'assets/school/bitik_2.jpg',
+                        'assets/school/bitik_3.jpg'
+                    ]
                 }];
 
                 schools.forEach(school => {
-                    const marker = L.marker(school.coords)
+                    const marker = L.marker(school.coords, {
+                        icon: L.icon({
+                            iconUrl: 'fdpr-red.png',
+                            iconSize: [45, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [0, -41],
+                            className: 'custom-marker-icon'
+                        })
+                    })
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
 
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${school.name}</h3>
+                                <p><strong>Address:</strong> ${school.address}</p>
                                 <p><strong>Location:</strong> ${school.coords[0].toFixed(4)}, ${school.coords[1].toFixed(4)}</p>
                                 <p>${school.description}</p>
+                                <div class="carousel-container">
+                                    <div class="carousel-track">
+                                        ${school.images.map((imgSrc, index) => `
+                                            <div class="carousel-item">
+                                                <img src="${imgSrc}" onclick="openModal('${imgSrc}')" alt="${school.name} Image ${index + 1}">
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="carousel-btn prev" onclick="moveCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="carousel-btn next" onclick="moveCarousel(1)"><i class="fas fa-chevron-right"></i></button>
+                                </div>
                             `;
 
                             // Toggle panel visibility based on screen size
@@ -455,28 +519,66 @@
             } else {
                 const venues = [{
                     name: 'THOA Wild Center',
+                    address: 'THOA Covered Court, GTDL, Valenzuela City',
                     coords: [14.682998859302277, 120.98803948610599],
-                    description:''
+                    description:'The THOA Wild Center, primarily used for recreational and community activities, can double as a flexible response space during flood-related emergencies. Its open area and accessible layout make it suitable for temporary evacuation or relief operations, particularly in the early stages of a disaster. The center also provides an opportunity to engage the community in educational workshops focused on flood risk awareness and preparedness strategies.',
+                    images: [
+                        'assets/court/thoa_1.jpg',
+                        'assets/court/thoa_2.jpg',
+                        'assets/court/thoa_3.jpg',
+                    ]
                 }, {
                     name: 'Manotoc Basketball Court',
+                    address: '58 Manotoc, Valenzuela, 1440 Metro Manila',
                     coords: [14.68306, 120.97972],
-                    description:''
+                    description:' The Manotoc Covered Basketball Court is a critical public space often repurposed as an emergency shelter during floods. Its wide, sheltered layout is ideal for housing evacuees and organizing relief goods. Frequently used for barangay assemblies and community drills, the court is also a familiar and trusted gathering point that enhances coordination during high-alert weather events. Its role in hosting community preparedness activities makes it a vital asset in local flood response efforts.',
+                    images: [
+                        'assets/court/manotoc_1.jpg',
+                        'assets/court/manotoc_2.jpg',
+                        'assets/court/manotoc_3.jpg',
+                    ]
                 }, {
                     name: 'Elysian Court',
+                    address: 'Engracion, Valenzuela, 1440 Metro Manila',
                     coords: [14.674347926774262, 120.97964155436341],
-                    description:''
+                    description:'Elysian Court is a residential complex that plays a minor yet strategic role in localized disaster preparedness. As a community living area, it can serve as a checkpoint or temporary staging area during flood emergencies, especially for organizing neighborhood evacuations or aid distribution. With proper coordination, it can also function as a platform for disseminating emergency alerts and preparedness information among residents.',
+                    images: [
+                        'assets/court/elysian_1.png',
+                        'assets/court/elysian_2.png',
+                        'assets/court/elysian_3.png',
+                    ]
                 }];
 
                 venues.forEach(venue => {
-                    const marker = L.marker(venue.coords)
+                    const marker = L.marker(venue.coords, {
+                        icon: L.icon({
+                            iconUrl: 'fdpr-red.png',
+                            iconSize: [45, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [0, -41],
+                            className: 'custom-marker-icon'
+                        })
+                    })
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
 
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${venue.name}</h3>
+                                <p><strong>Location:</strong> ${venue.address}</p>
                                 <p><strong>Location:</strong> ${venue.coords[0].toFixed(4)}, ${venue.coords[1].toFixed(4)}</p>
                                 <p>${venue.description}</p>
+                                <div class="carousel-container">
+                                    <div class="carousel-track">
+                                        ${venue.images.map((imgSrc, index) => `
+                                            <div class="carousel-item">
+                                                <img src="${imgSrc}" onclick="openModal('${imgSrc}')" alt="${venue.name} Image ${index + 1}">
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="carousel-btn prev" onclick="moveCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="carousel-btn next" onclick="moveCarousel(1)"><i class="fas fa-chevron-right"></i></button>
+                                </div>
                             `;
 
                             // Toggle panel visibility based on screen size
@@ -527,25 +629,57 @@
                 // Community center locations
                 const centers = [{
                     name: '3S Center Marulas',
+                    address: 'Marulas Market, Valenzuela, Metro Manila',
                     coords: [14.674130969163468, 120.98293965436353],
-                    description:''
+                    description:'The 3S Center (Service, Support & Solutions) in Marulas is a vital hub for local governance and public service delivery. During flood events, it serves as a command post for coordinating disaster response efforts, including evacuation, relief distribution, and real-time updates. It also houses records and planning tools that aid in risk assessment and mitigation. As a barangay-level operations center, the 3S Center plays a key role in ensuring rapid, organized, and community-focused response during times of crisis.',
+                    images: [
+                        'assets/evac/3s_1.jpg',
+                        'assets/evac/3s_2.jpg',
+                        'assets/evac/3s_3.jpg',
+                    ]
                 },{
                     name: 'MNDZ Evacuation Center',
+                    address: '2007 T. Santiago, Valenzuela, Metro Manila',
                     coords: [14.6896373612385, 120.9862151419276],
-                    description:''
+                    description:'The MNDZ Evacuation Center is a designated safe haven during flood emergencies in Barangay Marulas. Purpose-built for disaster scenarios, it is equipped to accommodate evacuees with essential amenities such as sleeping areas, sanitation facilities, and basic medical support. The center also serves as a logistics base for distributing relief goods and coordinating rescue operations. Its strategic location and dedicated function make it one of the most important assets in the community\'s flood preparedness and response infrastructure.',
+                    images: [
+                        'assets/evac/mndz_1.png',
+                        'assets/evac/mndz_2.jfif',
+                        'assets/evac/mndz_3.jpg',
+                    ]
                 }];
 
                 // Add markers
                 centers.forEach(center => {
-                    const marker = L.marker(center.coords)
+                    const marker = L.marker(center.coords, {
+                        icon: L.icon({
+                            iconUrl: 'fdpr-red.png',
+                            iconSize: [45, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [0, -41],
+                            className: 'custom-marker-icon'
+                        })
+                    })
                         .on('click', () => {
                             const infoPanel = document.getElementById('info-panel');
                             const isCurrentlyOpen = infoPanel.style.right === '0px';
 
                             document.getElementById('info-content').innerHTML = `
                                 <h3>${center.name}</h3>
+                                <p><strong>Address:</strong> ${center.address}</p>
                                 <p><strong>Location:</strong> ${center.coords[0].toFixed(4)}, ${center.coords[1].toFixed(4)}</p>
                                 <p>${center.description}</p>
+                                <div class="carousel-container">
+                                    <div class="carousel-track">
+                                        ${center.images.map((imgSrc, index) => `
+                                            <div class="carousel-item">
+                                                <img src="${imgSrc}" onclick="openModal('${imgSrc}')" alt="${center.name} Image ${index + 1}">
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="carousel-btn prev" onclick="moveCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="carousel-btn next" onclick="moveCarousel(1)"><i class="fas fa-chevron-right"></i></button>
+                                </div>
                             `;
 
                             // Toggle panel visibility based on screen size
