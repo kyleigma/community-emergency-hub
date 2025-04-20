@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emergency Contacts - Community Emergency Hub</title>
+    <link rel="icon" type="image/png" href="../fdpr-logo.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -82,10 +83,24 @@
         </main>
     </div>
     <script>
-        function toggleMenu() {
+        document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('active');
-        }
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            function toggleMenu() {
+                sidebar.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            }
+
+            menuToggle.addEventListener('click', toggleMenu);
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+        });
     </script>
 </body>
 </html>

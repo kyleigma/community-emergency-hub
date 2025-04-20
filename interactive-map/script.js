@@ -11,11 +11,18 @@ let mapFeatures = {
 
 // Function to update button active state
 function updateButtonState(featureId, button) {
+    // Simply add or remove the active class based on the feature state
+    // without affecting other buttons
     if (mapFeatures[featureId]) {
         button.classList.add('active');
     } else {
         button.classList.remove('active');
     }
+}
+
+// Function to get all active features
+function getActiveFeatures() {
+    return Object.keys(mapFeatures).filter(feature => mapFeatures[feature]);
 }
 
 // Toggle functions for each feature
@@ -24,6 +31,7 @@ function toggleEvacuationCenters() {
     mapFeatures.evacuationCenters = !mapFeatures.evacuationCenters;
     updateButtonState('evacuationCenters', button);
     // Add your map logic here
+    console.log('Active features:', getActiveFeatures());
 }
 
 function toggleFloodProne() {
@@ -31,6 +39,7 @@ function toggleFloodProne() {
     mapFeatures.floodProne = !mapFeatures.floodProne;
     updateButtonState('floodProne', button);
     // Add your map logic here
+    console.log('Active features:', getActiveFeatures());
 }
 
 function toggleEmergencyFacilities() {
@@ -38,6 +47,7 @@ function toggleEmergencyFacilities() {
     mapFeatures.emergencyFacilities = !mapFeatures.emergencyFacilities;
     updateButtonState('emergencyFacilities', button);
     // Add your map logic here
+    console.log('Active features:', getActiveFeatures());
 }
 
 function toggleMedicalFacilities() {
@@ -45,6 +55,7 @@ function toggleMedicalFacilities() {
     mapFeatures.medicalFacilities = !mapFeatures.medicalFacilities;
     updateButtonState('medicalFacilities', button);
     // Add your map logic here
+    console.log('Active features:', getActiveFeatures());
 }
 
 function toggleSchools() {
@@ -52,6 +63,7 @@ function toggleSchools() {
     mapFeatures.schools = !mapFeatures.schools;
     updateButtonState('schools', button);
     // Add your map logic here
+    console.log('Active features:', getActiveFeatures());
 }
 
 function toggleSportsVenues() {
@@ -59,6 +71,7 @@ function toggleSportsVenues() {
     mapFeatures.sportsVenues = !mapFeatures.sportsVenues;
     updateButtonState('sportsVenues', button);
     // Add your map logic here
+    console.log('Active features:', getActiveFeatures());
 }
 
 function toggleCommunityCenters() {
@@ -66,6 +79,7 @@ function toggleCommunityCenters() {
     mapFeatures.communityCenters = !mapFeatures.communityCenters;
     updateButtonState('communityCenters', button);
     // Add your map logic here
+    console.log('Active features:', getActiveFeatures());
 }
 
 // Initialize dropdown functionality
@@ -84,12 +98,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    marker.on('click', function() {
-        // Remove active class from all markers
-        evacuationMarkers.forEach(m => {
-            m.marker.getElement().classList.remove('active');
-        });
-        // Add active class to clicked marker
-        this.getElement().classList.add('active');
+    // Initialize all buttons to reflect their initial state
+    Object.keys(mapFeatures).forEach(feature => {
+        const buttonSelector = `button[onclick="toggle${feature.charAt(0).toUpperCase() + feature.slice(1)}()"]`;
+        const button = document.querySelector(buttonSelector);
+        if (button) {
+            updateButtonState(feature, button);
+        }
     });
+
+    // If there's a marker click handler, keep it
+    if (typeof marker !== 'undefined') {
+        marker.on('click', function() {
+            // Remove active class from all markers
+            evacuationMarkers.forEach(m => {
+                m.marker.getElement().classList.remove('active');
+            });
+            // Add active class to clicked marker
+            this.getElement().classList.add('active');
+        });
+    }
 });

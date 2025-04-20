@@ -83,6 +83,52 @@ body {
     margin-bottom: 2rem;
 }
 
+/* Tab styling */
+.tabs {
+    display: flex;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.tab-btn {
+    background: #f8f8f8;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px 8px 0 0;
+    margin-right: 0.5rem;
+    font-family: 'Coolvetica', Arial, sans-serif;
+    font-size: 2rem;
+}
+
+.tab-btn.active {
+    background: #FF4444;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .tabs {
+        flex-direction: column;
+        margin-bottom: 1.5rem;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+    }
+}
+
 /* Bandage cards styling */
 .bandage-items {
     display: grid;
