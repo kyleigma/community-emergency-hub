@@ -166,8 +166,10 @@ body {
 }
 
 .bandage-info h2 {
+    font-family: Inter;
+    font-weight: 800;
     color: #FF0000;
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     margin-bottom: 1rem;
 }
 
