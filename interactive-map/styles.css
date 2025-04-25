@@ -270,13 +270,16 @@ body {
 }
 
 .info-panel h3 {
-    color: #333;
+    font-size: 1.5rem;
+    color: #000000;
     margin-bottom: 15px;
 }
 
 .info-panel p {
+    font-family: Inter;
     margin-bottom: 10px;
     line-height: 1.4;
+    text-align: justify;
 }
 
 .info-panel ul {

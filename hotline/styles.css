@@ -4,6 +4,13 @@
     box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'Couture';
+  src: url('../assets/fonts/couture/couture-bld.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
     font-family: 'Coolvetica', Arial, sans-serif;
     overflow-x: hidden;
@@ -108,6 +115,8 @@ body {
 
     .content {
         padding: 1rem;
+        margin-left: 0;
+        width: 100%;
     }
 
     .contacts-grid {
@@ -127,13 +136,14 @@ body {
 
 .content {
     flex: 1;
-    padding: 1rem;
+    padding: 2rem;
     background-color: #fff;
 }
 
 .content h1 {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
+    font-family: Couture, Arial, sans-serif;
+    font-size: 2rem;
+    margin-bottom: 1rem;
 }
 
 .contacts-grid {
@@ -151,7 +161,7 @@ body {
 
 .contact-card h2 {
     color: #FF0000;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     margin-bottom: 1rem;
 }
 
@@ -161,11 +171,16 @@ body {
 }
 
 .contact-card li {
+    font-family: Inter;
+    font-weight: 800;
+    font-size: 1rem;
     margin-bottom: 0.5rem;
 }
 
-.contact-card p {
-    font-size: 1.1rem;
+.contact-card p {   
+    font-family: Inter;
+    font-weight: 400;
+    font-size: 1rem;
     margin-bottom: 0.5rem;
 }
 
@@ -174,7 +189,9 @@ body {
 }
 
 .smart {
-    font-size: 0.9rem;
+    font-family: Inter;
+    font-weight: 400;
+    font-size: 1rem;
     color: #666;
 }
 
@@ -202,5 +219,11 @@ body {
         height: 100px;
         top: 0;
         z-index: 998;
+    }
+
+    .content {
+        padding: 1rem !important; /* Added !important to override the default padding */
+        margin-left: 0;
+        width: 100%;
     }
 }

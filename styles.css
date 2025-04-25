@@ -1,4 +1,11 @@
 @font-face {
+  font-family: 'Couture';
+  src: url('../assets/fonts/couture/couture-bld.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
     font-family: 'Coolvetica';
     src: url('assets/fonts/coolvetica/Coolvetica Rg.otf') format('opentype');
     font-weight: normal;
@@ -400,6 +407,7 @@ h1 {
 }
 
 .footer-section h3 {
+    font-family: Couture;
     font-size: 1.5rem;
     margin-bottom: 10px;
     color: #FF4444;
@@ -414,8 +422,11 @@ h1 {
 }
 
 .footer-section p {
+    font-family: Inter;
+    font-weight: 400;
     line-height: 1.6;
     margin-bottom: 15px;
+    text-align: justify;
 }
 
 .footer-section i {
